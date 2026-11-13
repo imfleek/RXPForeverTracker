@@ -1,22 +1,51 @@
-# Builds the addon zip and publishes a GitHub Release (with CHANGELOG.md) whenever a version tag (v1.0, v1.0.1, ...) is pushed.
+# Release on a new version: when a push to main carries a toc "## Version:" that has no v<version> tag yet, this tags
+# the commit and builds the release (BigWigs packager: the addon zip plus a GitHub Release with CHANGELOG.md).
+# A pushed v* tag releases too. Pushes that keep the same version do nothing.
 name: Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: BigWigsMods/packager@v2
+      - name: Tag a new version
+        id: version
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            echo "release=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          version=$(grep -m1 '^## Version:' RXPForeverTracker.toc | sed 's/^## Version:[[:space:]]*//' | tr -d '\r[:space:]')
+          tag="v${version}"
+          if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+            echo "${tag} already released: nothing to do."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "${tag}" -m "RXP ForeverTracker ${version}"
+            git push origin "${tag}"
+            echo "Tagged ${tag}."
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Package and release
+        if: steps.version.outputs.release == 'true'
+        uses: BigWigsMods/packager@v2
         env:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
           # To upload to CurseForge too: add a CF_API_KEY repository secret and "## X-Curse-Project-ID: <id>" to the toc.
