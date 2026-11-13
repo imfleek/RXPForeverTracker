@@ -1014,3 +1014,4 @@ Same priorities as 3.0.5 / 3.0.8 / 3.5.3: per-frame and per-update CPU first, th
 | R100-3 | Release zip always named RXPForeverTracker.zip | release.yml: packager -n "RXPForeverTracker:{project-version}" (dry run: RXPForeverTracker.zip). |
 | R101-1 | README: _forever_ path, "Settings: /qt" header, commands in tables with descriptions, no Layout section | README.md. |
 | R100-4 | Release notes also include the major release's entry (## <major>.0, e.g. 1.0 for 1.x) | release.yml: this version's section, then a rule and the major's section (not repeated for the .0 release itself). Simulated for 1.0.1 and 1.0. |
+| R102-1 | Eye-catching README (first three sections), Commands (Backup to /qt Config) collapsed | README.md as previewed and edited by the user. |

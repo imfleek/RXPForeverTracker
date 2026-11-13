@@ -1,31 +1,62 @@
-# RXP ForeverTracker
+<div align="center">
 
-A mouse-wheel scrollable quest tracker for WoW Forever (16001) with zone sorting (closest quest first), rewards after
-quest titles and detailed quest tooltips, plus RestedXP guide steps in the tracker (click-to-use circles, waypoint
-arrow, back-a-step button) when RestedXP Guides is installed. Blizzard's own tracker is kept and placed inside a
-clipping frame that scrolls.
+# 🧭 RXP ForeverTracker
 
-Optional: RestedXP Guides (guide steps), Questie (quest giver, turn-in, objective locations, chains, attunement star,
-party progress, closest-quest sorting).
+**A scrollable, smarter quest tracker for WoW Forever, with your RestedXP guide built right in.**
 
-## Install / upgrade
+[![Latest release](https://img.shields.io/github/v/release/imfleek/RXPForeverTracker?label=release&color=c9a24a)](https://github.com/imfleek/RXPForeverTracker/releases/latest)
+![WoW Forever](https://img.shields.io/badge/WoW_Forever-16001-8b1a10)
+[![License: MIT](https://img.shields.io/badge/license-MIT-4c7a3d)](LICENSE)
 
-1. Extract the `RXPForeverTracker` folder into `World of Warcraft/_forever_/Interface/AddOns/`.
-2. Upgrading from the earlier separate addons: log in once with them still enabled (settings are copied and this
-   addon stays off for that session), then disable them and `/reload`.
+</div>
 
-## Settings: `/qt`
+---
 
-Categories on the left:
+### ✨ Highlights
 
-- **Quest Tracker**: Quest list (lock, extra length, scrollbar, items, quest count, header colours), Zone headers, Quest titles, Tooltips, Tracking and sorting (Track mode, zone sort).
-- **RXP Tracker**: Tracker settings (including Own window), Waypoint arrow, Themes & guide (theme, status, choose a guide, restart or reset guides), Orphaned quests.
-- **Settings Window**: Text and font, Advanced, Background, Profiles (save, load, delete, import and export; starts on "Default"), Minimap button.
+- 🖱️ **Mouse-wheel scrolling** for Blizzard's own tracker, with an optional scrollbar. The tracker itself is kept as it is, inside a frame that scrolls, so long quest lists never run off the screen.
+- 🗺️ **Zone sorting**: quests grouped under zone headers, with the closest quest first.
+- 💰 **Rewards at a glance**: experience and gold after each quest title, a check on finished quests, and tooltips with objectives, rewards and the gold an item reward sells for.
+- 📜 **Your RestedXP guide in the tracker**: the current and upcoming steps with click-to-use item and spell buttons, a waypoint arrow, back / restart / forward buttons (Shift+click for the previous or next zone guide), and a check to mark a step done.
+- 🔗 **Links everywhere**: items, spells and quests in guide steps show their tooltips; Shift+click a quest to link it in chat.
+- 📖 **Prerequisite Journal** (with Questie): for every quest still ahead in your guide, the prerequisites you are missing, where to do them, and which later guide does them on the way.
+- ❓ **"Why did guide skip?"** (`/qt why`): a plain-words list of every guide and step move, who made it and why, ready to copy into a bug report.
+- 🧹 **Orphaned quest cleanup**: quests your guide no longer uses, coloured by difficulty, with their zone, sortable, and abandoned one by one or all at once.
+- 🎨 **Forever Style settings window** with search, profiles you can import and export, and per-page Defaults.
 
-Colours have presets, a custom colour and an opacity slider. The search box finds any setting.
-Shift+right-click the guide in the tracker opens the window; right-click opens the guide menu.
+> **Optional Integrated addons:**
+> - **RestedXP Guides**: guide steps in the tracker
+> - **Questie**: quest giver, turn-in and objective locations, chains, attunement star, party progress, closest-quest sorting
 
-## Commands
+## 📦 Install / upgrade
+
+1. Download **`RXPForeverTracker.zip`** from the [latest release](https://github.com/imfleek/RXPForeverTracker/releases/latest).
+2. Extract the `RXPForeverTracker` folder into:
+   ```
+   World of Warcraft/_forever_/Interface/AddOns/
+   ```
+3. **Upgrading from the earlier separate addons?** Log in once with them still enabled (your settings are copied and
+   this addon stays off for that session), then disable them and `/reload`.
+
+## ⚙️ Settings: `/qt`
+
+The categories are on the left of the settings window:
+
+| Category | Pages |
+| --- | --- |
+| 📋 **Quest Tracker** | Quest list (lock, extra length, scrollbar, items, quest count, header colours) · Zone headers · Quest titles · Tooltips · Tracking and sorting (track mode, zone sort) |
+| 🧭 **RXP Tracker** | Tracker settings (including Own window) · Waypoint arrow · Themes & guide (theme, status, choose, restart or reset guides) · Orphaned quests |
+| 🪟 **Settings Window** | Text and font · Advanced · Background · Profiles (save, load, delete, import, export; starts on "Default") · Minimap button |
+
+> 💡 **Tips**
+> - Colours have presets, a custom colour and an opacity slider.
+> - The search box finds any setting.
+> - **Shift+right-click** the guide in the tracker to open this window; **right-click** opens the guide menu.
+
+## Commands (Backup to /qt Config)
+
+<details>
+<summary><b>Show all commands</b></summary>
 
 Type `/qt help` in game for this list.
 
@@ -63,3 +94,5 @@ Type `/qt help` in game for this list.
 | `/qt welcome` | Opens the guide chooser. |
 | `/qt restart` | Starts the current guide again from its first step. |
 | `/qt why` | Opens "Why did guide skip?": the latest guide and step moves and what caused them. |
+
+</details>

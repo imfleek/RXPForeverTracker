@@ -2,6 +2,10 @@
 
 All notable changes to RXP ForeverTracker. Newest first. Settings window: `/qt`.
 
+## 1.0.2
+### Changed
+- A new-look README: badges, a Highlights list of the main features, the optional integrated addons, a download link and copyable install path, the settings categories in a table with tips, and the commands in a collapsible section.
+
 ## 1.0.1
 ### Changed
 - README: install path is `_forever_`, every command is listed in two tables (quest tracker, RXP Tracker) with what it does, and the developer-only Layout section is gone.
