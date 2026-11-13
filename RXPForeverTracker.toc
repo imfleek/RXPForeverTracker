@@ -1,0 +1,53 @@
+## Interface: 16001
+## Title: RXP ForeverTracker
+## Notes: Shows your RestedXP guide steps in the objective tracker (click-to-use circles, waypoint arrow, back a step) and makes the tracker mouse-wheel scrollable, with zone sorting, rewards and tooltips. Settings: /qt
+## Version: 1.0
+## Category: Quests
+## IconTexture: Interface\AddOns\RXPForeverTracker\Textures\Cow
+## SavedVariables: RXPForeverTrackerDB, RXPForeverTrackerGuideDB
+## AllowLoadGameType: camelot
+## LoadSavedVariablesFirst: 1
+## OptionalDeps: RXPGuides, LibSharedMedia-3.0, Questie, QuestieDB
+
+Bootstrap.lua
+
+Objectives/Core.lua
+Objectives/rxp/Readers.lua
+Objectives/rxp/Uses.lua
+Objectives/rxp/Snapshot.lua
+Objectives/features/QuestFocus.lua
+Objectives/features/QuestReady.lua
+Objectives/features/Windows.lua
+Objectives/features/RxpFixes.lua
+Objectives/features/WhyWindow.lua
+Objectives/features/Onboarding.lua
+Objectives/features/GuideMenu.lua
+Objectives/circle/Circle.lua
+Objectives/circle/Action.lua
+Objectives/tracker/SkipBox.lua
+Objectives/tracker/Rows.lua
+Objectives/tracker/Header.lua
+Objectives/tracker/Tracker.lua
+Objectives/arrow/Button.lua
+Objectives/arrow/Pin.lua
+Objectives/arrow/Moons.lua
+Objectives/arrow/Drag.lua
+Objectives/arrow/Arrow.lua
+Objectives/Slash.lua
+Objectives/Settings.lua
+
+Tracker/Core.lua
+Tracker/Profiles.lua
+Tracker/Fonts.lua
+Tracker/ZoneFilter.lua
+Tracker/ZoneSort.lua
+Tracker/Extras.lua
+Tracker/Questie.lua
+Tracker/Track.lua
+Tracker/Party.lua
+Tracker/MoreQuests.lua
+Tracker/Config.lua
+Tracker/DebugWindow.lua
+Tracker/Prereqs.lua
+Tracker/Conflicts.lua
+Tracker/Minimap.lua

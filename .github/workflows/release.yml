@@ -1,0 +1,23 @@
+# Builds the addon zip and publishes a GitHub Release (with CHANGELOG.md) whenever a version tag (v1.0, v1.0.1, ...) is pushed.
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: BigWigsMods/packager@v2
+        env:
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+          # To upload to CurseForge too: add a CF_API_KEY repository secret and "## X-Curse-Project-ID: <id>" to the toc.
+          # CF_API_KEY: ${{ secrets.CF_API_KEY }}

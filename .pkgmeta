@@ -1,0 +1,10 @@
+package-as: RXPForeverTracker
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+ignore:
+  - REQUIREMENTS.md
+  - tests
+  - .github
