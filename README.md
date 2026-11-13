@@ -12,6 +12,14 @@
 
 ---
 
+## 📦 Install
+
+1. Download **`RXPForeverTracker.zip`** from the [latest release](https://github.com/imfleek/RXPForeverTracker/releases/latest).
+2. Extract the `RXPForeverTracker` folder into:
+   ```
+   World of Warcraft/_forever_/Interface/AddOns/
+   ```
+
 ### ✨ Highlights
 
 - 🖱️ **Mouse-wheel scrolling** for Blizzard's own tracker, with an optional scrollbar. The tracker itself is kept as it is, inside a frame that scrolls, so long quest lists never run off the screen.
@@ -27,16 +35,6 @@
 > **Optional Integrated addons:**
 > - **RestedXP Guides**: guide steps in the tracker
 > - **Questie**: quest giver, turn-in and objective locations, chains, attunement star, party progress, closest-quest sorting
-
-## 📦 Install / upgrade
-
-1. Download **`RXPForeverTracker.zip`** from the [latest release](https://github.com/imfleek/RXPForeverTracker/releases/latest).
-2. Extract the `RXPForeverTracker` folder into:
-   ```
-   World of Warcraft/_forever_/Interface/AddOns/
-   ```
-3. **Upgrading from the earlier separate addons?** Log in once with them still enabled (your settings are copied and
-   this addon stays off for that session), then disable them and `/reload`.
 
 ## ⚙️ Settings: `/qt`
 
