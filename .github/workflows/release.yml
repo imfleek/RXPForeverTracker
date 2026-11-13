@@ -1,6 +1,6 @@
 # Release on a new version: when a push to main carries a toc "## Version:" that has no v<version> tag yet, this tags
 # the commit and builds the release (BigWigs packager: the addon zip plus a GitHub Release with CHANGELOG.md).
-# A pushed v* tag releases too. Pushes that keep the same version do nothing.
+# A pushed v* tag releases too. A version whose GitHub Release already exists is not released again.
 name: Release
 
 on:
@@ -24,29 +24,41 @@ jobs:
 
       - name: Tag a new version
         id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-            echo "release=true" >> "$GITHUB_OUTPUT"
-            exit 0
+            tag="${GITHUB_REF_NAME}"
+          else
+            version=$(grep -m1 '^## Version:' RXPForeverTracker.toc | sed 's/^## Version:[[:space:]]*//' | tr -d '\r[:space:]')
+            tag="v${version}"
+            if ! git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+              git config user.name "github-actions[bot]"
+              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+              git tag -a "${tag}" -m "RXP ForeverTracker ${version}"
+              git push origin "${tag}"
+              echo "Tagged ${tag}."
+            fi
           fi
-          version=$(grep -m1 '^## Version:' RXPForeverTracker.toc | sed 's/^## Version:[[:space:]]*//' | tr -d '\r[:space:]')
-          tag="v${version}"
-          if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
-            echo "${tag} already released: nothing to do."
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+          # a version is released once: skip it when its GitHub Release exists
+          if gh release view "${tag}" >/dev/null 2>&1; then
+            echo "${tag} is already released: nothing to do."
             echo "release=false" >> "$GITHUB_OUTPUT"
           else
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git tag -a "${tag}" -m "RXP ForeverTracker ${version}"
-            git push origin "${tag}"
-            echo "Tagged ${tag}."
             echo "release=true" >> "$GITHUB_OUTPUT"
           fi
 
+      # BigWigs packager (the addon zip and a GitHub Release with CHANGELOG.md). Run as its script with the tag as the
+      # ref: on a branch push the packager action itself would wait for a tag push instead of releasing.
       - name: Package and release
         if: steps.version.outputs.release == 'true'
-        uses: BigWigsMods/packager@v2
         env:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
           # To upload to CurseForge too: add a CF_API_KEY repository secret and "## X-Curse-Project-ID: <id>" to the toc.
           # CF_API_KEY: ${{ secrets.CF_API_KEY }}
+        run: |
+          git checkout -q "refs/tags/${{ steps.version.outputs.tag }}"
+          curl -sSfL https://raw.githubusercontent.com/BigWigsMods/packager/v2/release.sh -o "${RUNNER_TEMP}/release.sh"
+          GITHUB_REF="refs/tags/${{ steps.version.outputs.tag }}" GITHUB_REF_TYPE=tag \
+            GITHUB_REF_NAME="${{ steps.version.outputs.tag }}" bash "${RUNNER_TEMP}/release.sh"
