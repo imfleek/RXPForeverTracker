@@ -59,14 +59,25 @@ jobs:
           # CF_API_KEY: ${{ secrets.CF_API_KEY }}
         run: |
           git checkout -q "refs/tags/${{ steps.version.outputs.tag }}"
-          # the release notes: only this version's CHANGELOG.md section (its "## <version>" heading up to the next one);
-          # the repository keeps the whole history
+          # the release notes: this version's CHANGELOG.md section (its "## <version>" heading up to the next one), then
+          # the major release it belongs to ("## <major>.0", e.g. 1.0 for every 1.x); the repository keeps the whole history
           version=$(grep -m1 '^## Version:' RXPForeverTracker.toc | sed 's/^## Version:[[:space:]]*//' | tr -d '\r[:space:]')
-          awk -v v="$version" '
-            /^##? / { if (found) exit; split($0, w, " "); if (w[1] == "##" && (w[2] == v || w[2] == "v" v)) found = 1 }
-            found { print }
-          ' CHANGELOG.md > "${RUNNER_TEMP}/notes.md"
+          major="${version%%.*}.0"
+          section() {
+            awk -v v="$1" '
+              /^##? / { if (found) exit; split($0, w, " "); if (w[1] == "##" && (w[2] == v || w[2] == "v" v)) found = 1 }
+              found { print }
+            ' CHANGELOG.md
+          }
+          section "$version" > "${RUNNER_TEMP}/notes.md"
           if [ -s "${RUNNER_TEMP}/notes.md" ]; then
+            if [ "$major" != "$version" ]; then
+              section "$major" > "${RUNNER_TEMP}/major.md"
+              if [ -s "${RUNNER_TEMP}/major.md" ]; then
+                printf '\n---\n\n' >> "${RUNNER_TEMP}/notes.md"
+                cat "${RUNNER_TEMP}/major.md" >> "${RUNNER_TEMP}/notes.md"
+              fi
+            fi
             cp "${RUNNER_TEMP}/notes.md" CHANGELOG.md
           else
             echo "::warning::No '## ${version}' section in CHANGELOG.md: the whole file is used."
