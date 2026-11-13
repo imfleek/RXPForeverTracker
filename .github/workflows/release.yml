@@ -59,6 +59,18 @@ jobs:
           # CF_API_KEY: ${{ secrets.CF_API_KEY }}
         run: |
           git checkout -q "refs/tags/${{ steps.version.outputs.tag }}"
+          # the release notes: only this version's CHANGELOG.md section (its "## <version>" heading up to the next one);
+          # the repository keeps the whole history
+          version=$(grep -m1 '^## Version:' RXPForeverTracker.toc | sed 's/^## Version:[[:space:]]*//' | tr -d '\r[:space:]')
+          awk -v v="$version" '
+            /^##? / { if (found) exit; split($0, w, " "); if (w[1] == "##" && (w[2] == v || w[2] == "v" v)) found = 1 }
+            found { print }
+          ' CHANGELOG.md > "${RUNNER_TEMP}/notes.md"
+          if [ -s "${RUNNER_TEMP}/notes.md" ]; then
+            cp "${RUNNER_TEMP}/notes.md" CHANGELOG.md
+          else
+            echo "::warning::No '## ${version}' section in CHANGELOG.md: the whole file is used."
+          fi
           curl -sSfL https://raw.githubusercontent.com/BigWigsMods/packager/v2/release.sh -o "${RUNNER_TEMP}/release.sh"
           GITHUB_REF="refs/tags/${{ steps.version.outputs.tag }}" GITHUB_REF_TYPE=tag \
             GITHUB_REF_NAME="${{ steps.version.outputs.tag }}" bash "${RUNNER_TEMP}/release.sh"
