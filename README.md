@@ -16,10 +16,8 @@
 
 1. Download **`RXPForeverTracker.zip`** from the [latest release](https://github.com/imfleek/RXPForeverTracker/releases/latest).
 2. Extract the `RXPForeverTracker` folder into:
-   ```
 
-   BattleNet/World of Warcraft/_forever_/Interface/AddOns/
-   ```
+   `BattleNet/World of Warcraft/_forever_/Interface/AddOns/`
 
 ### ✨ Highlights
 
