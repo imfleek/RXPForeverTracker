@@ -2,6 +2,12 @@
 
 All notable changes to RXP ForeverTracker. Newest first. Settings window: `/qt`.
 
+## 1.0.3
+### Added
+- First release on CurseForge. Releases now go to GitHub and CurseForge together.
+### Changed
+- README: "How to Install" comes first, with the full `BattleNet/World of Warcraft/_forever_/Interface/AddOns/` path in a copyable box.
+
 ## 1.0.2
 ### Changed
 - A new-look README: badges, a Highlights list of the main features, the optional integrated addons, a download link and copyable install path, the settings categories in a table with tips, and the commands in a collapsible section.
