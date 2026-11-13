@@ -12,12 +12,13 @@
 
 ---
 
-## 📦 Install
+## 📦 How to Install
 
 1. Download **`RXPForeverTracker.zip`** from the [latest release](https://github.com/imfleek/RXPForeverTracker/releases/latest).
 2. Extract the `RXPForeverTracker` folder into:
    ```
-   World of Warcraft/_forever_/Interface/AddOns/
+
+   BattleNet/World of Warcraft/_forever_/Interface/AddOns/
    ```
 
 ### ✨ Highlights
