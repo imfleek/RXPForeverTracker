@@ -73,4 +73,5 @@ jobs:
           fi
           curl -sSfL https://raw.githubusercontent.com/BigWigsMods/packager/v2/release.sh -o "${RUNNER_TEMP}/release.sh"
           GITHUB_REF="refs/tags/${{ steps.version.outputs.tag }}" GITHUB_REF_TYPE=tag \
-            GITHUB_REF_NAME="${{ steps.version.outputs.tag }}" bash "${RUNNER_TEMP}/release.sh"
+            GITHUB_REF_NAME="${{ steps.version.outputs.tag }}" bash "${RUNNER_TEMP}/release.sh" \
+            -n "RXPForeverTracker:{project-version}"   # the zip is always RXPForeverTracker.zip (label: the version)
