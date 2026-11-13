@@ -54,9 +54,10 @@ jobs:
       - name: Package and release
         if: steps.version.outputs.release == 'true'
         env:
-          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
-          # To upload to CurseForge too: add a CF_API_KEY repository secret and "## X-Curse-Project-ID: <id>" to the toc.
-          # CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # CurseForge upload: the project is "## X-Curse-Project-ID" in the toc, the token the CF_API_KEY repository secret
+          # (without the secret, the upload is skipped and the GitHub release still goes out)
+          CF_API_TOKEN: ${{ secrets.CF_API_KEY }}
         run: |
           git checkout -q "refs/tags/${{ steps.version.outputs.tag }}"
           # the release notes: this version's CHANGELOG.md section (its "## <version>" heading up to the next one), then
