@@ -1012,3 +1012,4 @@ Same priorities as 3.0.5 / 3.0.8 / 3.5.3: per-frame and per-update CPU first, th
 | R100-1 | Release 1.0 on GitHub (imfleek/RXPForeverTracker); earlier builds marked pre-release alpha | Repo layout = addon folder; .pkgmeta (package-as, manual-changelog, ignore REQUIREMENTS/tests/.github); .github/workflows/release.yml (BigWigsMods/packager@v2 on v* tags); tests/ committed. |
 | R100-2 | Release notes list only that version's changelog section | release.yml: awk cuts the "## <version>" section of CHANGELOG.md into the package before the packager runs (whole file as fallback, with a warning). |
 | R100-3 | Release zip always named RXPForeverTracker.zip | release.yml: packager -n "RXPForeverTracker:{project-version}" (dry run: RXPForeverTracker.zip). |
+| R101-1 | README: _forever_ path, "Settings: /qt" header, commands in tables with descriptions, no Layout section | README.md. |
