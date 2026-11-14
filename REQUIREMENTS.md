@@ -1017,3 +1017,4 @@ Same priorities as 3.0.5 / 3.0.8 / 3.5.3: per-frame and per-update CPU first, th
 | R102-1 | Eye-catching README (first three sections), Commands (Backup to /qt Config) collapsed | README.md as previewed and edited by the user. |
 | R100-5 | Upload releases to CurseForge (project 1801986) | toc ## X-Curse-Project-ID: 1801986; release.yml passes the CF_API_KEY secret as CF_API_TOKEN (packager's current names). Needs the CF_API_KEY repository secret. |
 | R103-1 | 1.0.3: first CurseForge release | toc 1.0.3, CHANGELOG entry; released from main once confirmed. |
+| R104-1 | Ctrl quest tooltip: what finishing the quest or its chain unlocks, and new chains (tooltips + Questie on) | Questie.lua unlock index (preQuestSingle/preQuestGroup reverse, sliced build), forPlayer race/class masks, unlocksOf/unlockSets, addUnlockLines, chainTooltip and Ctrl refresh; Config.lua questieUnlocks check; DEFAULTS. unlocks_test. In game: not run |

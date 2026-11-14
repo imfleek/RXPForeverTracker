@@ -1,7 +1,7 @@
 ## Interface: 16001
 ## Title: RXP ForeverTracker
 ## Notes: Shows your RestedXP guide steps in the objective tracker (click-to-use circles, waypoint arrow, back a step) and makes the tracker mouse-wheel scrollable, with zone sorting, rewards and tooltips. Settings: /qt
-## Version: 1.0.3
+## Version: 1.0.4
 ## Category: Quests
 ## X-Curse-Project-ID: 1801986
 ## IconTexture: Interface\AddOns\RXPForeverTracker\Textures\Cow

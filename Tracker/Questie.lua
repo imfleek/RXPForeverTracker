@@ -312,15 +312,138 @@ local function isDone(quest)
 	end
 end
 
+-- What finishing a quest unlocks: quest -> the quests that name it as a prerequisite (preQuestSingle: any one of them
+-- opens the quest; preQuestGroup: all of them). Built once from every quest Questie knows, a slice per frame like the
+-- reward index; nil while building.
+local unlockIndex, unlockBuilding
+local QUESTS_PER_FRAME = 1500
+local function buildUnlockIndex()
+	if unlockIndex or unlockBuilding then return end
+	local ok, ids
+	local lib = _G.LibQuestieDB
+	if type(lib) == "table" and type(lib.Quest) == "table" and type(lib.Quest.GetAllIds) == "function" then
+		ok, ids = pcall(lib.Quest.GetAllIds)
+	else
+		local qdb = module("QuestieDB")
+		if qdb and type(qdb.QuestPointers) == "table" then
+			ids = {}
+			for id in pairs(qdb.QuestPointers) do ids[#ids + 1] = id end
+			ok = true
+		end
+	end
+	if not ok or type(ids) ~= "table" then unlockIndex = {} return end
+	unlockBuilding = true
+	local index, i = {}, 1
+	local ticker
+	ticker = C_Timer.NewTicker(0, function()
+		local stop = math.min(i + QUESTS_PER_FRAME - 1, #ids)
+		for n = i, stop do
+			local quest = ids[n]
+			for _, field in ipairs({ "preQuestSingle", "preQuestGroup" }) do
+				local pre = get("Quest", quest, field)
+				if type(pre) == "table" then
+					for _, required in ipairs(pre) do
+						if type(required) == "number" then
+							index[required] = index[required] or {}
+							table.insert(index[required], { quest = quest, group = field == "preQuestGroup" and pre or nil })
+						end
+					end
+				end
+			end
+		end
+		i = stop + 1
+		if i > #ids then
+			ticker:Cancel()
+			unlockIndex, unlockBuilding = index, false
+			if api.refreshQuestTooltip then api.refreshQuestTooltip() end
+		end
+	end)
+end
+
+-- a quest this character can take: Questie's requiredRaces / requiredClasses masks (bit raceID-1 / classID-1; 0 or
+-- none: everyone)
+local function forPlayer(quest)
+	local band = _G.bit and _G.bit.band
+	if not band then return true end
+	local races = tonumber(get("Quest", quest, "requiredRaces"))
+	if races and races > 0 then
+		local raceID = select(3, UnitRace("player"))
+		if raceID and band(races, 2 ^ (raceID - 1)) == 0 then return false end
+	end
+	local classes = tonumber(get("Quest", quest, "requiredClasses"))
+	if classes and classes > 0 then
+		local classID = select(3, UnitClass("player"))
+		if classID and band(classes, 2 ^ (classID - 1)) == 0 then return false end
+	end
+	return true
+end
+
+-- The quests finishing `id` opens for you (not done yet, for your race and class, not in `skip`), each
+-- { quest, chainSize = quests in the new chain it starts (it leads on to others),
+--   alsoNeeds = { names of the other prerequisites not done yet } }. nil while the index is building.
+local function unlocksOf(id, skip)
+	if not unlockIndex then buildUnlockIndex() return nil end
+	local out, seen = {}, {}
+	for _, entry in ipairs(unlockIndex[id] or {}) do
+		local quest = entry.quest
+		if not seen[quest] and not (skip and skip[quest]) and not isDone(quest) and forPlayer(quest) then
+			seen[quest] = true
+			local item = { quest = quest }
+			-- a new chain: it leads on (nextQuestInChain); its length counted forward from it
+			local size, cursor, walked = 1, quest, { [quest] = true }
+			while size <= MAX_CHAIN do
+				local nxt = get("Quest", cursor, "nextQuestInChain")
+				if type(nxt) ~= "number" or nxt == 0 or walked[nxt] then break end
+				walked[nxt] = true
+				size, cursor = size + 1, nxt
+			end
+			if size > 1 then item.chainSize = size end
+			if entry.group then
+				for _, other in ipairs(entry.group) do
+					if other ~= id and type(other) == "number" and not isDone(other) then
+						item.alsoNeeds = item.alsoNeeds or {}
+						item.alsoNeeds[#item.alsoNeeds + 1] = questName(other)
+					end
+				end
+			end
+			out[#out + 1] = item
+		end
+	end
+	table.sort(out, function(a, b)
+		local la, lb = tonumber(get("Quest", a.quest, "questLevel")) or 0, tonumber(get("Quest", b.quest, "questLevel")) or 0
+		if la ~= lb then return la < lb end
+		return a.quest < b.quest
+	end)
+	return out
+end
+
 -- Ctrl held, or the tooltip measuring its Ctrl width (Extras.lua api.setChainCtrl)
 local forceCtrl = false
 function api.setChainCtrl(on) forceCtrl = on and true or false end
 local function ctrlDown() return forceCtrl or IsControlKeyDown() end
--- the tooltip may change with Ctrl (a chain to show)
+
+-- What finishing this quest and finishing its chain open (quests the chain shows are left out): now, later, and
+-- whether the index is still building
+local function unlockSets(id)
+	if ns.db.questieUnlocks == false then return {}, {}, false end
+	local list = ns.db.questieChain ~= false and chainList(id) or nil
+	local skip = {}
+	for _, quest in ipairs(list or {}) do skip[quest] = true end
+	local nxt = get("Quest", id, "nextQuestInChain")
+	if type(nxt) == "number" then skip[nxt] = true end
+	local now = unlocksOf(id, skip)
+	local final = list and list[#list] ~= id and list[#list] or nil
+	local later = final and unlocksOf(final, skip) or {}
+	if now == nil or later == nil then return {}, {}, true end
+	return now, later, false, list
+end
+
+-- the tooltip may change with Ctrl (a chain, or what it unlocks, to show)
 function api.chainTooltip(id)
-	if not (id and api.questieOn()) or ns.db.questieChain == false then return false end
-	local list = chainList(id)
-	return list ~= nil
+	if not (id and api.questieOn()) then return false end
+	if ns.db.questieChain ~= false and chainList(id) ~= nil then return true end
+	local now, later = unlockSets(id)
+	return #now > 0 or #later > 0
 end
 
 -- Follow-up, chain (whole chain while Ctrl is held), the chain's final reward and totals.
@@ -344,8 +467,10 @@ local function addChainLines(tip, id)
 				else tip:AddLine("  " .. label, 1, 1, 1, true) end
 			end
 		else
-			tip:AddLine(db.questieChainReward and "Hold Ctrl to see the whole chain, its final reward and total"
-				or "Hold Ctrl to see the whole chain", 0.5, 0.5, 0.5)
+			local now, later = unlockSets(id)
+			local unlocksToo = #now > 0 or #later > 0
+			tip:AddLine((db.questieChainReward and "Hold Ctrl to see the whole chain, its final reward and total"
+				or "Hold Ctrl to see the whole chain") .. (unlocksToo and ", and what it unlocks" or ""), 0.5, 0.5, 0.5, true)
 			if db.questieChainReward then buildRewardIndex() end -- ready by the time Ctrl is pressed
 		end
 	end
@@ -376,6 +501,45 @@ local function addChainLines(tip, id)
 end
 
 
+-- What finishing this quest, and finishing its chain, opens: while Ctrl is held, the quests with their level, and
+-- whether each starts a new chain; without Ctrl a hint (the chain's hint says it when there is a chain).
+local function unlockLine(tip, item)
+	local level = get("Quest", item.quest, "questLevel")
+	local label = questName(item.quest) .. (level and (" [" .. level .. "]") or "")
+	local note = ""
+	if item.chainSize then note = (" |cff9ad0ffstarts a new chain of %d quests|r"):format(item.chainSize) end
+	tip:AddLine("  " .. label .. note, 1, 1, 1, true)
+	if item.alsoNeeds then
+		tip:AddLine("    also needs: " .. table.concat(item.alsoNeeds, ", "), 0.6, 0.6, 0.6, true)
+	end
+end
+local function addUnlockLines(tip, id)
+	if ns.db.questieUnlocks == false then return end
+	local now, later, loading, list = unlockSets(id)
+	if loading then
+		if ctrlDown() then tip:AddLine(" "); tip:AddLine("Unlocks: loading...", 0.5, 0.5, 0.5) end
+		return
+	end
+	local hasNow, hasLater = #now > 0, #later > 0
+	if not (hasNow or hasLater) then return end
+	if not ctrlDown() then
+		if not list then -- no chain hint: say it here
+			tip:AddLine(" ")
+			tip:AddLine("Hold Ctrl to see what this quest unlocks", 0.5, 0.5, 0.5)
+		end
+		return
+	end
+	tip:AddLine(" ")
+	if hasNow then
+		tip:AddLine("Finishing this quest unlocks:", 0.6, 0.8, 1)
+		for _, item in ipairs(now) do unlockLine(tip, item) end
+	end
+	if hasLater then
+		tip:AddLine("Finishing the chain unlocks:", 0.6, 0.8, 1)
+		for _, item in ipairs(later) do unlockLine(tip, item) end
+	end
+end
+
 -- Tooltip lines (Extras.lua questTooltip calls this after the objectives).
 function api.addQuestieLines(tip, id)
 	if not (id and api.questieOn()) then return end
@@ -392,6 +556,7 @@ function api.addQuestieLines(tip, id)
 		end
 	end
 	addChainLines(tip, id)
+	addUnlockLines(tip, id)
 end
 
 -- Raid attunement quests: Questie has no attunement flag, so the attunement chains are found from their final
@@ -821,8 +986,8 @@ ns.onLogin[#ns.onLogin + 1] = function()
 	local keys = CreateFrame("Frame")
 	keys:RegisterEvent("MODIFIER_STATE_CHANGED")
 	keys:SetScript("OnEvent", function(_, _, key)
-		if (key == "LCTRL" or key == "RCTRL") and api.questieOn() and ns.db.questieChain ~= false
-			and api.refreshQuestTooltip then
+		if (key == "LCTRL" or key == "RCTRL") and api.questieOn()
+			and (ns.db.questieChain ~= false or ns.db.questieUnlocks ~= false) and api.refreshQuestTooltip then
 			api.refreshQuestTooltip()
 		end
 	end)

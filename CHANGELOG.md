@@ -2,6 +2,10 @@
 
 All notable changes to RXP ForeverTracker. Newest first. Settings window: `/qt`.
 
+## 1.0.4
+### Added
+- Quest tooltips (with Questie): hold **Ctrl** to see what finishing the quest unlocks, and what finishing its whole chain unlocks. Each quest it opens shows its level, "starts a new chain of N quests" when it leads on to others, and "also needs: …" when another unfinished quest is required too. Only quests for your race and class that you haven't done are listed, and quests the chain already shows are not repeated. Without Ctrl, the tooltip's hint says when there is something to see. On/off: Settings → Tooltips → "What finishing the quest or its chain unlocks" (on by default).
+
 ## 1.0.3
 ### Added
 - First release on CurseForge. Releases now go to GitHub and CurseForge together.

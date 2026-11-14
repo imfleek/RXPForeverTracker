@@ -1815,6 +1815,8 @@ local function declareItems(db)
 		check("Chain's final reward and totals", function() return db.questieChainReward end,
 			function(v) db.questieChainReward = v end,
 			function() return questieTips() and db.questieChain ~= false end, 48)
+		check("What finishing the quest or its chain unlocks", function() return db.questieUnlocks ~= false end,
+			function(v) db.questieUnlocks = v end, questieTips, 24, "hold Ctrl: the quests it opens, and new chains")
 	end
 	pageByKey.tooltips.reset = resetQuests
 
